@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './modules/auth/auth.module'
 import { ClientsModule } from './modules/clients/clients.module'
 import { SessionsModule } from './modules/sessions/sessions.module'
 import { MailModule } from './modules/mail/mail.module'
-import { LoggerModule, AllExceptionsFilter, LoggingInterceptor } from './common'
+import { ObservabilityModule } from '@psy/observability/nestjs'
 
 @Module({
   imports: [
@@ -18,8 +17,8 @@ import { LoggerModule, AllExceptionsFilter, LoggingInterceptor } from './common'
       envFilePath: ['.env.local', '.env'],
     }),
 
-    // Logging (auto-selects adapter based on environment)
-    LoggerModule.forRootAsync(),
+    // Observability (logging, metrics, tracing)
+    ObservabilityModule.forRootAsync(),
 
     // Database
     TypeOrmModule.forRootAsync({
@@ -46,18 +45,6 @@ import { LoggerModule, AllExceptionsFilter, LoggingInterceptor } from './common'
     SessionsModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    // Global exception filter - logs all unhandled exceptions
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-    // Global logging interceptor - logs all requests
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

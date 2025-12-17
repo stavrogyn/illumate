@@ -10,10 +10,15 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "start": "turbo run start",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "turbo run clean && rm -rf node_modules",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "observability:up": "docker compose -f infra/docker/docker-compose.observability.yml up -d",
+    "observability:down": "docker compose -f infra/docker/docker-compose.observability.yml down",
+    "observability:logs": "docker compose -f infra/docker/docker-compose.observability.yml logs -f"
   },
   "devDependencies": {
     "prettier": "^3.7.4",

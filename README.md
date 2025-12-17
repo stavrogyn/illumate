@@ -94,27 +94,14 @@ ESLint конфигурации:
 - `nextjs.js` — правила для Next.js
 - `nestjs.js` — правила для NestJS
 
-## 🔄 Миграция с FastAPI
-
-Проект мигрирует с FastAPI на NestJS. Основные модули:
-
-| FastAPI                        | NestJS         | Статус      |
-| ------------------------------ | -------------- | ----------- |
-| Auth (register, login, verify) | AuthModule     | ✅ Готов    |
-| Clients CRUD                   | ClientsModule  | ✅ Готов    |
-| Sessions CRUD                  | SessionsModule | ✅ Готов    |
-| Email Service (AWS SES)        | MailModule     | ✅ Готов    |
-| AI Analysis (LangChain)        | —              | ⏸️ Отложено |
-| Audio Recording                | —              | ⏸️ Отложено |
-
 ## 🗄️ База данных
 
 ```bash
 # Создание PostgreSQL базы
-createdb psy_db
+createdb db
 
 # Или через Docker
-docker run --name psy-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=psy_db -p 5432:5432 -d postgres:16
+docker run --name db -e POSTGRES_PASSWORD=your_password -e POSTGRES_DB=db -p 5432:5432 -d postgres:14
 ```
 
 ## 📝 Лицензия

@@ -1,0 +1,70 @@
+# Grafana Data Sources
+apiVersion: 1
+
+datasources:
+  # VictoriaMetrics (Primary metrics store)
+  - name: VictoriaMetrics
+    type: prometheus
+    uid: victoria-metrics
+    access: proxy
+    url: http://victoria-metrics:8428
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+
+  # Prometheus (Fallback)
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: false
+    editable: false
+    jsonData:
+      httpMethod: POST
+      manageAlerts: false
+
+  # Loki (Logs)
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    url: http://loki:3100
+    isDefault: false
+    editable: false
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: '"trace_?[iI]d"\s*:\s*"(\w+)"'
+          name: TraceID
+          url: '$${__value.raw}'
+
+  # Tempo (Traces)
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    access: proxy
+    url: http://tempo:3200
+    isDefault: false
+    editable: false
+    jsonData:
+      httpMethod: GET
+      serviceMap:
+        datasourceUid: victoria-metrics
+      nodeGraph:
+        enabled: true
+      lokiSearch:
+        datasourceUid: loki
+      tracesToLogs:
+        datasourceUid: loki
+        filterByTraceID: true
+        filterBySpanID: false
+        mapTagNamesEnabled: true
+        tags:
+          - key: service.name
+            value: service_name

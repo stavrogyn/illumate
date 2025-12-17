@@ -1,0 +1,63 @@
+# Prometheus Configuration for Local Development
+# Used as a fallback scraper and for compatibility
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'psy-local'
+
+# Alerting configuration (optional)
+alerting:
+  alertmanagers: []
+
+# Rule files (optional)
+rule_files: []
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # PSY API metrics
+  - job_name: 'psy-api'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['host.docker.internal:4000']
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: psy-api
+
+  # OTEL Collector metrics
+  - job_name: 'otel-collector'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['otel-collector:8889']
+
+  # VictoriaMetrics metrics
+  - job_name: 'victoria-metrics'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['victoria-metrics:8428']
+
+  # Loki metrics
+  - job_name: 'loki'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['loki:3100']
+    metrics_path: /metrics
+
+  # Tempo metrics
+  - job_name: 'tempo'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['tempo:3200']
+    metrics_path: /metrics
+
+# Remote write to VictoriaMetrics
+remote_write:
+  - url: http://victoria-metrics:8428/api/v1/write

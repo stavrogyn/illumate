@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { LoggerAdapter, LogContext, LOGGER_ADAPTER } from './adapters/logger-adapter.interface'
+import { LOGGER_ADAPTER } from './adapters/logger-adapter.interface'
+import type { LoggerAdapter, LogContext } from './adapters/logger-adapter.interface'
 
 @Injectable()
 export class LoggerService {
