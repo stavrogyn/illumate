@@ -87,7 +87,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "sum(rate(http_requests_total{service=\"psy-api\"}[5m]))",
+          "expr": "sum(rate(http_requests_total{service=\"@psy/api\"}[5m]))",
           "legendFormat": "RPS",
           "refId": "A"
         }
@@ -155,7 +155,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "sum(rate(http_requests_total{service=\"psy-api\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{service=\"psy-api\"}[5m])) * 100",
+          "expr": "sum(rate(http_requests_total{service=\"@psy/api\",status=\"5xx\"}[5m])) / sum(rate(http_requests_total{service=\"@psy/api\"}[5m])) * 100",
           "legendFormat": "Error Rate",
           "refId": "A"
         }
@@ -223,7 +223,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"psy-api\"}[5m])) by (le)) * 1000",
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"@psy/api\"}[5m])) by (le)) * 1000",
           "legendFormat": "p95",
           "refId": "A"
         }
@@ -291,7 +291,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service=\"psy-api\"}[5m])) by (le)) * 1000",
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service=\"@psy/api\"}[5m])) by (le)) * 1000",
           "legendFormat": "p99",
           "refId": "A"
         }
@@ -396,7 +396,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "sum(rate(http_requests_total{service=\"psy-api\"}[5m])) by (route)",
+          "expr": "sum(rate(http_requests_total{service=\"@psy/api\"}[5m])) by (route)",
           "legendFormat": "{{route}}",
           "refId": "A"
         }
@@ -488,7 +488,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"psy-api\"}[5m])) by (le, route)) * 1000",
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"@psy/api\"}[5m])) by (le, route)) * 1000",
           "legendFormat": "{{route}}",
           "refId": "A"
         }
@@ -623,7 +623,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "sum(increase(http_requests_total{service=\"psy-api\",status_code=~\"[45]..\"}[1m])) by (status_code)",
+          "expr": "sum(increase(http_requests_total{service=\"@psy/api\",status_code=~\"[45]..\"}[1m])) by (status_code)",
           "legendFormat": "{{status_code}}",
           "refId": "A"
         }
@@ -714,7 +714,7 @@
             "type": "prometheus",
             "uid": "victoria-metrics"
           },
-          "expr": "sum(increase(app_errors_total{service=\"psy-api\"}[1m])) by (error_type)",
+          "expr": "sum(increase(app_errors_total{service=\"@psy/api\"}[1m])) by (error_type)",
           "legendFormat": "{{error_type}}",
           "refId": "A"
         }

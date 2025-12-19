@@ -16,7 +16,7 @@ receivers:
         - job_name: 'psy-api'
           scrape_interval: 15s
           static_configs:
-            - targets: ['host.docker.internal:4000']
+            - targets: ['host.docker.internal:8000']
           metrics_path: /metrics
 
 processors:
