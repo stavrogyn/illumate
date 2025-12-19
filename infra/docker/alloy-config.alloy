@@ -1,0 +1,70 @@
+// Grafana Alloy Configuration for Faro RUM
+// Receives frontend telemetry and forwards to Loki/Tempo/Prometheus
+
+// ===========================================
+// Faro Receiver - accepts browser RUM data
+// ===========================================
+faro.receiver "default" {
+  server {
+    listen_address = "0.0.0.0"
+    listen_port = 12347
+    
+    cors_allowed_origins = ["*"]
+  }
+
+  output {
+    logs   = [loki.process.faro.receiver]
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+// ===========================================
+// Process logs - add required labels
+// ===========================================
+loki.process "faro" {
+  forward_to = [loki.write.default.receiver]
+
+  // Add static labels
+  stage.static_labels {
+    values = {
+      source = "faro",
+      service_name = "psy-web",
+    }
+  }
+}
+
+// ===========================================
+// Loki - Send logs
+// ===========================================
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+  external_labels = {
+    cluster = "local",
+    env = "development",
+  }
+}
+
+// ===========================================
+// OTLP Exporter - Send traces to Tempo
+// ===========================================
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+// ===========================================
+// Prometheus metrics endpoint for Web Vitals
+// Alloy exposes its own metrics at :12345/metrics
+// We can add custom metrics via prometheus.scrape
+// ===========================================
+prometheus.remote_write "victoriametrics" {
+  endpoint {
+    url = "http://victoria-metrics:8428/api/v1/write"
+  }
+}

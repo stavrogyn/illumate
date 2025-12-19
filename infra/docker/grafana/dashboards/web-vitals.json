@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Web Vitals and Real User Monitoring metrics from Grafana Faro",
+  "description": "Web Vitals and Real User Monitoring metrics from Grafana Faro (stored in Loki)",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -38,10 +38,10 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "victoria-metrics"
+        "type": "loki",
+        "uid": "loki"
       },
-      "description": "Largest Contentful Paint - measures loading performance. Good: <2.5s, Needs Improvement: <4s",
+      "description": "Largest Contentful Paint - measures loading performance.\nGood: <2.5s, Needs Improvement: <4s, Poor: >4s",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -51,30 +51,16 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 2500
-              },
-              {
-                "color": "red",
-                "value": 4000
-              }
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2500 },
+              { "color": "red", "value": 4000 }
             ]
           },
           "unit": "ms"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 0,
-        "y": 1
-      },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 1 },
       "id": 2,
       "options": {
         "colorMode": "value",
@@ -82,9 +68,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "p75"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -93,12 +77,8 @@
       "pluginVersion": "10.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "victoria-metrics"
-          },
-          "expr": "histogram_quantile(0.75, sum(rate(faro_web_vitals_lcp_bucket{app=\"psy-web\"}[5m])) by (le))",
-          "legendFormat": "p75 LCP",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "avg_over_time({source=\"faro\"} |= \"web-vitals\" | pattern `<_> lcp=<lcp> <_>` | unwrap lcp [$__interval])",
           "refId": "A"
         }
       ],
@@ -107,10 +87,10 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "victoria-metrics"
+        "type": "loki",
+        "uid": "loki"
       },
-      "description": "Interaction to Next Paint - measures responsiveness. Good: <200ms, Needs Improvement: <500ms",
+      "description": "Interaction to Next Paint - measures interactivity.\nGood: <200ms, Needs Improvement: <500ms, Poor: >500ms",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -120,30 +100,16 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 200
-              },
-              {
-                "color": "red",
-                "value": 500
-              }
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 200 },
+              { "color": "red", "value": 500 }
             ]
           },
           "unit": "ms"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 8,
-        "y": 1
-      },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 1 },
       "id": 3,
       "options": {
         "colorMode": "value",
@@ -151,9 +117,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "p75"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -162,12 +126,8 @@
       "pluginVersion": "10.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "victoria-metrics"
-          },
-          "expr": "histogram_quantile(0.75, sum(rate(faro_web_vitals_inp_bucket{app=\"psy-web\"}[5m])) by (le))",
-          "legendFormat": "p75 INP",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "avg_over_time({source=\"faro\"} |= \"web-vitals\" | pattern `<_> inp=<inp> <_>` | unwrap inp [$__interval])",
           "refId": "A"
         }
       ],
@@ -176,43 +136,30 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "victoria-metrics"
+        "type": "loki",
+        "uid": "loki"
       },
-      "description": "Cumulative Layout Shift - measures visual stability. Good: <0.1, Needs Improvement: <0.25",
+      "description": "Cumulative Layout Shift - measures visual stability.\nGood: <0.1, Needs Improvement: <0.25, Poor: >0.25",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 3,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 0.1
-              },
-              {
-                "color": "red",
-                "value": 0.25
-              }
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.1 },
+              { "color": "red", "value": 0.25 }
             ]
           },
           "unit": "none"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 16,
-        "y": 1
-      },
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 1 },
       "id": 4,
       "options": {
         "colorMode": "value",
@@ -220,9 +167,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "p75"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -231,16 +176,59 @@
       "pluginVersion": "10.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "victoria-metrics"
-          },
-          "expr": "histogram_quantile(0.75, sum(rate(faro_web_vitals_cls_bucket{app=\"psy-web\"}[5m])) by (le))",
-          "legendFormat": "p75 CLS",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "avg_over_time({source=\"faro\"} |= \"web-vitals\" | pattern `<_> cls=<cls> <_>` | unwrap cls [$__interval])",
           "refId": "A"
         }
       ],
       "title": "CLS (p75)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "Number of Web Vitals measurements received",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 1 },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["sum"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "count_over_time({source=\"faro\"} |= \"web-vitals\" [$__range])",
+          "refId": "A"
+        }
+      ],
+      "title": "Measurements",
       "type": "stat"
     },
     {
@@ -251,122 +239,141 @@
         "x": 0,
         "y": 7
       },
-      "id": 5,
+      "id": 6,
       "panels": [],
-      "title": "Page Performance",
+      "title": "Additional Metrics",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "victoria-metrics"
+        "type": "loki",
+        "uid": "loki"
       },
+      "description": "First Contentful Paint - time to first content render",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1800 },
+              { "color": "red", "value": 3000 }
             ]
           },
           "unit": "ms"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 6,
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 8 },
+      "id": 7,
       "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["mean"],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "textMode": "auto"
       },
+      "pluginVersion": "10.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "victoria-metrics"
-          },
-          "expr": "histogram_quantile(0.75, sum(rate(faro_web_vitals_lcp_bucket{app=\"psy-web\"}[5m])) by (le, page))",
-          "legendFormat": "{{page}}",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "avg_over_time({source=\"faro\"} |= \"web-vitals\" | pattern `<_> fcp=<fcp> <_>` | unwrap fcp [$__interval])",
           "refId": "A"
         }
       ],
-      "title": "LCP by Page",
-      "type": "timeseries"
+      "title": "FCP",
+      "type": "stat"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "victoria-metrics"
+        "type": "loki",
+        "uid": "loki"
       },
+      "description": "Time to First Byte - server response time",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 800 },
+              { "color": "red", "value": 1800 }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 8 },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["mean"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "avg_over_time({source=\"faro\"} |= \"web-vitals\" | pattern `<_> ttfb=<ttfb> <_>` | unwrap ttfb [$__interval])",
+          "refId": "A"
+        }
+      ],
+      "title": "TTFB",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 9,
+      "panels": [],
+      "title": "Trends",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "LCP trend over time",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 10,
+            "fillOpacity": 20,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -375,68 +382,130 @@
             },
             "insertNulls": false,
             "lineInterpolation": "smooth",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "auto",
             "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
+            "stacking": { "group": "A", "mode": "none" },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "line"
             }
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2500 },
+              { "color": "red", "value": 4000 }
             ]
           },
-          "unit": "short"
+          "unit": "ms"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
-      },
-      "id": 7,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "id": 10,
       "options": {
         "legend": {
-          "calcs": [
-            "sum"
-          ],
+          "calcs": ["mean", "max"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
+          "mode": "single",
+          "sort": "none"
         }
       },
+      "pluginVersion": "10.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "victoria-metrics"
-          },
-          "expr": "sum(increase(faro_page_views_total{app=\"psy-web\"}[5m])) by (page)",
-          "legendFormat": "{{page}}",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "avg_over_time({source=\"faro\"} |= \"web-vitals\" | pattern `<_> lcp=<lcp> <_>` | unwrap lcp [$__interval])",
+          "legendFormat": "LCP",
           "refId": "A"
         }
       ],
-      "title": "Page Views by Page",
+      "title": "LCP Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "description": "CLS trend over time",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "decimals": 3,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.1 },
+              { "color": "red", "value": 0.25 }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": ["mean", "max"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "avg_over_time({source=\"faro\"} |= \"web-vitals\" | pattern `<_> cls=<cls> <_>` | unwrap cls [$__interval])",
+          "legendFormat": "CLS",
+          "refId": "A"
+        }
+      ],
+      "title": "CLS Over Time",
       "type": "timeseries"
     },
     {
@@ -445,125 +514,57 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 22
       },
-      "id": 8,
+      "id": 12,
       "panels": [],
-      "title": "Errors",
+      "title": "Raw Events",
       "type": "row"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "victoria-metrics"
+        "type": "loki",
+        "uid": "loki"
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "bars",
-            "fillOpacity": 100,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 17
-      },
-      "id": 9,
+      "description": "Raw Web Vitals log entries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 23 },
+      "id": 13,
       "options": {
-        "legend": {
-          "calcs": [
-            "sum"
-          ],
-          "displayMode": "table",
-          "placement": "right",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
       },
+      "pluginVersion": "10.3.3",
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "victoria-metrics"
-          },
-          "expr": "sum(increase(faro_errors_total{app=\"psy-web\"}[5m])) by (error_type)",
-          "legendFormat": "{{error_type}}",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "expr": "{source=\"faro\"} |= \"web-vitals\"",
           "refId": "A"
         }
       ],
-      "title": "Frontend Errors",
-      "type": "timeseries"
+      "title": "Web Vitals Events",
+      "type": "logs"
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": [
-    "psy",
-    "web",
-    "rum",
-    "web-vitals"
-  ],
+  "tags": ["web-vitals", "rum", "faro", "frontend"],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
+  "timezone": "",
   "title": "PSY Web Vitals (RUM)",
   "uid": "psy-web-vitals",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
-

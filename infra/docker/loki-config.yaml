@@ -46,10 +46,6 @@ limits_config:
   ingestion_burst_size_mb: 6
   max_entries_limit_per_query: 5000
 
-# Enable structured metadata
-frontend:
-  encoding: protobuf
-
 # Analytics
 analytics:
   reporting_enabled: false

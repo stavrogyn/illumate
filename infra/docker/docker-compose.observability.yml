@@ -96,6 +96,25 @@ services:
       - loki
       - tempo
 
+  # Grafana Alloy - Faro RUM receiver + telemetry pipeline
+  alloy:
+    image: grafana/alloy:v1.0.0
+    container_name: psy-alloy
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+    volumes:
+      - ./alloy-config.alloy:/etc/alloy/config.alloy
+    ports:
+      - '12345:12345' # Alloy UI
+      - '12347:12347' # Faro receiver
+    networks:
+      - observability
+    depends_on:
+      - loki
+      - tempo
+
   # Prometheus - Scrapes metrics from services (fallback)
   prometheus:
     image: prom/prometheus:v2.49.1
